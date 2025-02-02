@@ -90,7 +90,7 @@ if cpp_found
 endif
 
 ## Python
-python = find_program('python')
+python = find_program('python3')
 
 meson_util_py = find_program(
   'meson-util.py',
