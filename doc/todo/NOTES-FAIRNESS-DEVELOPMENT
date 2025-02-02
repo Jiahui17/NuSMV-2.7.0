@@ -1,0 +1,233 @@
+=== Domenica 12 aprile
+
+. the last bug seems to be fixed: confusion between si2s and si2i
+
+. show_vars should use smv file notation to print ranges; by default
+  show all
+
+. option use reachable states to be implemented
+
+. while trying to reset ag_only_search set does not seem to work
+  properly
+
+=== Lunedi' 29 marzo (AC)
+
+. diversi livelli di verbosity:
+	cosa sta succedendo (e.g. #iterazioni)
+	quanti stati/quali stati
+	dim bdd/minterms
+  
+=== Domenica 28 marzo (AC)
+  
+. da discutere user interaction dei plugins (cosa sono row/column/ e
+  vedere se funziona ok).
+
+. dobbiamo stabilire una convenzione per i nomi dei comandi tipo
+  show/print/ ... e se singolare/plurale (property/traces)
+
+. le liste di stati andrebbero ordinati in base al range dei valori
+  che l'utente specifica nel range. 
+
+. la nozione di "loop starts here" non e' piu corretta: in questo
+  momento si fa il check solo dello stato, ma dipende se stiamo
+  effettivamente ripetendo tutte le transizioni o meno; nel caso di
+  fairness_ivar.smv non succede. 
+
+  Questo e' comunque un problema anche nel caso degli stati in quanto
+  la ripetizione puo' non essere adeguata per quanto riguarda la spec
+  cui e' associata.
+
+. discutere tipi di fairness list e in generale gli impatti di
+  tipizzazione aggressiva...
+
+. chiaramente eg sugli stati non funziona. Duplichiamo il codice
+  utilizzato per calcolare i fair states e quello per i fair cycles.
+
+. show_property non sembra vedere correttamente la prima entry quando
+  e' falsa: non mostra la tracce, ma n/a. il db delle tracce sembra
+  ok.
+
+. sembra che sia disallineato numero di traccia e numero di stati
+
+
+=== Sabato 27 marzo (AC)
+
+. verificare se il memoizing del model cheking funziona -- altrimenti
+  potrebbe essere un problema
+
+. trovare un esempio che fa vedere come fissare ordine dei fair
+  constraints non e' sempre una buona idea.
+
+. dd_manager - globale - usata pervasivamente all'interno di
+  mcExplain.c
+
+. penso che ci sia un problema nella reimplemnetazione di
+  fairness_explain fatta da roberto, si perde la ricorsione sul resto
+  della lista. Da verificare in dettaglio.
+
+. primitive per checkare se bdd e': singleton di stati; stati;
+  stati_input; ...
+
+
+=== Venerdi' 26 marzo (AC)
+
+. da rivedere le modalita' di printing del sistema. In particolare per
+  fini didattici e di debugging nusmv dovrebbe essere in grado di
+  printare fuori in modalita' explicit state. 
+
+. sto cercando di forzare gli stati manipolati dal model checker a
+  essere fair -- potrebbe essere utile per il total model
+  checking. Questo pero e' un probelma in quanto il complemento si
+  perde questa proprieta; similmente per i reachable states.
+
+  In realta' il problema e' piu profondo ed e' a livello logico. Se
+  abbiamo una macchia cui facciamo query di un operatore temporale
+  (es. AG, EU, AF) cosa dovrebbe ritornare? Penso dei fair states, ma
+  in questo momento non e' garantito. I reachable dovrebbe invece
+  essere controllato da una opzione.
+
+. sicuramente e' noto, ma Enc_get_bdd_encoding() come funzione senza
+  argomenti non e' particolarmente bello...
+
+. nel testing, verificare l'insieme di stati in cui le proprieta' che
+  sono vere invece che semplicemente se valgono in inizio modello.
+
+. il simulatore di default dovrebbe scegliere in modo random invece
+  che deterministico. Pick_state dovrebbe essere fatto di default (non
+  c'e una sola volta che me lo ricordi) Non c'e' un modo di simulare
+  dentro fair states -- secondo me andrebbe previsto. (Un modo
+  potrebbe essere estendere i constraints a generiche variabili ctl, e
+  dire "EG 1" per l'insieme dei fair states).
+
+. simulatore: constraints must be simple expressions, altrimenti fa
+  pick state da una si-table
+
+. implmenetare routine checker per vedere se una cosa e' veramente uno
+  stato o se e' una SI (non so se veramente parte della interfaccia)
+
+. dme1.smv e dme2.smv danno delle differenze in 
+
+  NuSMV: bdd/BddFsm.c:1246:
+	BddFsm_get_fair_states: Assertion `fs == alt_fs' failed.
+
+  nel calcolo dei fair states. Da checkare.
+
+. dd_printminterm dovrebbe essere dd_printminterms (many states) 
+
+=== Giovedi' 25 marzo (AC RC)
+
+. il pick state che determina da dove parte il controesempio (caso
+  base) e' stupido: per esempio se ho (f U g) potrebbe tornare uno
+  stato che soddisfa f quando ce ne e' uno in g. NB anche nello step
+  case!!!!!
+
+. forzare la restrizione ai fairstates dentro ex forza il calcolo dei
+  fair states anche quando vogliamo calcolare un faircycle dentro a q.
+  Notare che EG(q) coincide logicamente con EG(q and fair_states) ma
+  non computazionalmente in quanto calcolare fair_states puo'
+  richiedere un effort sostanziale.
+
+. rimuovere dd_manager (global variable)
+
+. fare typing da bdd a BddStates etc dentro mc
+
+. capire ruolo di use_fair_states (cfr marco roveri)
+
+. ex: problema di ruolo delle fairness. 
+
+  Considera ex(5,6) dove 6 non e' fair.
+
+  56 =PI=> 2345 =Fair=> 2345
+  56 =Fair=> 5 =PI=> 234
+
+  Dovrebbe essere sempre applicato, eliminare opzione.
+
+. fare primitive di BddFsm_restrict_to_reachable e BddFsm_restrict_to_fair.
+
+
+=== Mercoledi 24 marzo (AC RC)
+
+. costruzione delle maschere locale all'encoding... e.g. apply mask
+  per state, input, state_input, ...
+
+. controllare init e invar non contengono labels
+
+. printer degli stati -- tiene in conto i define o no???
+
+. scritta diameter (dovrebbe essere intialized diameter)
+
+. la nozione di reachable tiene conto dei fair states o no????
+
+
+
+=== martedi 23 marzo (AC)
+
+. mapping inverso da BDD a sexp - per fare un printing decente
+
+. PROBLEMA DI DISALLINEAMENTO TRA messaggio in check_trans e compute reachable
+
+NuSMV > check_trans
+##########################################################
+WARNING *** Reachable states have not been computed.   ***
+WARNING *** The following result may be wrong.         ***
+WARNING *** Call functions compute_reachable or        ***
+WARNING *** print_reachable_state to compute the       ***
+WARNING *** reachable states.                          ***
+The Transition relation is not total. A deadlock state is:
+label = a
+_process_selector_ = main
+status = 8
+##########################################################
+
+
+=== martedi 23 marzo (AC, RC)
+
+. naming convention: uso di set_of_states vs states
+
+. print_reachable_states di default prende versione verbosa mentre
+  dovrebbe prendere versione short. Commento dovrebbe specificare
+  default.
+
+. problema delle maschere -- installazione del patch circolato su
+  nusmv-users? 
+
+. comando di valutazione sexpressions/ctl formula/altro da
+  interactive con print esplicito
+
+. interactive per forzare la computazione dei reachable states
+
+. ci serve riconoscitore di input all'interno di una formula
+  proposizionale
+
+. chiarire: la nozione di fair states in una macchina dipende da
+  reachable states o se e' computata a prescindere
+
+. chiarire: init constraints sono solo vincoli sullo stato --
+  non e' possibile usare variabili di input. 
+
+. chiarire: invar constraints possono essere vincoli su stato o su
+  transizioni - a seconda vanno messi dentro la transition relation o
+  come invar. Per il momento non modifichiamo il linguaggio, a seconda
+  del riconoscitore collochiamo la espressione al posto giusto.
+
+. _process_selector_ : valutare la eliminazione quando non ci sono
+  processi.
+
+. un migliore printer per gli insiemi di stati
+
+. fare sparire Invar da BddInvarStates e BddInvarInputs 
+
+. da fare passata globale ai nomi
+
+. accesso alla cache nel caso di estrazione di successo viene fatta
+  due volte
+
+. comando per printare gli stati di deadlock
+
+. cache collassa NULL con NONCOMPUTATO; nel caso composizione di
+  macchine potrebbe avere senso prevedere caso intermedio
+  (e.g. overapprossimazione)
+
+. eliminare !!!! the_node !!!!!
+
+. gestione di compassion constraints 

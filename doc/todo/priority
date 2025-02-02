@@ -1,0 +1,92 @@
+First attempt to priritize the list of new features worth to be
+implemented in further versions of NuSMV.
+
+----------------------------------------------------------------------
+--   High priority
+----------------------------------------------------------------------
+
+  *) Remove the problem of ADDs that as they are implemented now they
+     are not able to perform a lot of optimizations that before the
+     introduction of words where available. See note [ADD] at the end
+     of this document. This has mainly impact on model construction,
+     and it might explain the loss of performance in some cases while
+     building the model. I expect that this fix will improve
+     performance of NuSMV, expecially in model construction.
+  *) porting NuSMV on the last version of CUDD.
+     - This will possibly make even more easier the porting to 64bits.
+  *) Porting NuSMV on the latest version of Minisat. It provides
+  *) circuit encoding for words, thus avoiding going to ADDs in the
+     conversion to boolean expressions and then into RBC.
+     - For BDD operations this is somehow already available. The
+       routines to convert into boolean expressions, and then into RBC
+       should be extended to deal natively with the circuit based
+       encoding of word expressions.
+  *) Write a new parser to read and write AIGER formats
+     (http://fmv.jku.at/aiger/)
+     This is important for several reasons:
+     - AIGER is a standard format agreed among different model
+       checkers developers.
+     - It will be used in the model checking competition
+  *) Replace RBCs with AIG (And/Inverter Graphs)
+     - One possible version is available at http://fmv.jku.at/aiger/
+     - Another version is within VIS. This one interacts with a bdd
+       package for reducing the size of the AIG by doing some BDD
+       sweeping (as far I understand from the code, but might be I'm
+       wrong).
+     PROBLEMS/ISSUES:
+     - This has a great impact in all the BMC stuff, unless we will be
+       able to replace current RBCs with this new data structure.
+     - CNF conversion must be re-considered and in particular the
+       possible inpact on incremental SAT solving.
+     - We need to understand issue of licenses if we want to use
+       available libraries. 
+  *) Increase word size limit to more than 64bits
+
+
+
+----------------------------------------------------------------------
+--   Mid priority
+----------------------------------------------------------------------
+
+  *) Interpolant based model checking.
+     Currently, Minisat 1.12 has been extended to generate
+     interpolants. The integration in NuSMV is under
+     investigations. The interface to the SAT solvers should then be
+     extended to allow to return not only the SAT asssignment, but
+     also the interpolant.
+  *) Improve clustering on threshold mechanism.
+
+     - A simple heuristic would be to merge clusters Ci and Cj of the
+       transition relation only if 
+
+          |Ci ^ Cj| <= |C1| + |C2| 
+
+       This is a simple merge condition for clusters. A more tunable
+       variant would be to introduce some weight "w"
+
+           (w * |Ci ^ Cj|) <= |C1| + |C2| 
+
+       Alternatively, we can think to try to join the two clusters
+       only if |C1| + |C2| <= W where W is the threshold.
+
+     - Another approach can be the one proposed by Bwolen Yang. Start
+       trying to build the AND, but stop if the size of the
+       intermediate BDD reaches a threshold. This is not easy to
+       implement, since it requires modification of CUDD. Cudd 2.4.1
+       have a new function that attempt to build the AND, and stops
+       when the number of new nodes reaches a threshold. This is of
+       course not the same thing proposed by Bwoleng Yang, but it is
+       at least a good approximation.
+
+   *) Think about a tree structured quantification scheduling
+      mechanism for computing the image/pre-image of a set of states.
+
+   *) Think to a mechanism for maintaining the set of INVAR statements
+      partitioned internally (currently it is monolithic). One
+      possible solution would be to integrate it in the clustered
+      transition relation. This will not completely solve the problem,
+      since there is still the problem to consider them to restrict
+      the set of initial states.
+
+      BWD:  Exist x'.i. (Invar(x) & Tr(x, i, x') & Invar(x') & S(x')
+      FWD:  Exist x.i.  (Invar(x) & Tr(x, i, x') & Invar(x') & S(x)

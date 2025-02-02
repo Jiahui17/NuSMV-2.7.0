@@ -1,0 +1,28 @@
+core_c += files(
+  'automata_label_creator.c',
+  'automataPkg.c',
+  'Automaton.c',
+  'AutomataLoc.c',
+  'AutomataTransition.c',
+  'AutomataManager.c',
+  'AutomataAlgoChooser.c',
+  'AutomataBddLoc.c',
+  'AutomataNamedLoc.c',
+  'AutomataModeLoc.c',
+  'AbstractAutomaton.c',
+
+  'labels/AutomataBddLabel.c',
+  'labels/AutomataBddLabelCombinator.c',
+  'labels/AutomataLabel.c',
+  'labels/AutomataLabelCombinator.c',
+  'labels/AutomataHybridLabel.c',
+
+  'utils/AutomataLocHash.c',
+  'utils/AutomataLocCoupleHash.c',
+  'utils/AutomataLocTriple.c',
+  'utils/AutomataLocSet.c',
+  'utils/AutomataLocSetHash.c',
+  'utils/AutomataPredecessorsList.c',
+  'utils/AutomataSimRel.c',
+  'utils/automata_error.c',
+)

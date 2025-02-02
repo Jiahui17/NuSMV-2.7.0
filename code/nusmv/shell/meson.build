@@ -1,0 +1,18 @@
+# NuSMV/code/nusmv/shell/meson.build
+
+subdir('bmc')
+subdir('cinit')
+subdir('cmd')
+subdir('compile')
+subdir('dd')
+subdir('enc')
+subdir('fsm')
+subdir('hrc')
+subdir('ltl')
+subdir('mc')
+subdir('opt')
+subdir('parser')
+subdir('prop')
+subdir('simulate')
+subdir('trace')
+subdir('utils')

@@ -1,0 +1,268 @@
+Below is the type system of the input NuSMV language.
+
+========
+1. The full list of all possible types: 
+   boolean, 
+   set_of_integers, 
+   set_of_symbols, 
+   set_of_integers_and_symbols, 
+   Integer, 
+   Real, 
+   Word[N] (where N is a positive number).
+Example:
+	VAR a : 0..1; /* boolean type */
+	VAR b : {1,2,3}; /* set_of_integers type */
+	VAR c : {OK, GOOD, PERFECT}; /* set_of_symbols type */
+	VAR d : {1,2, OK}; /* set_of_integers_and_symbols type */
+	VAR e : Integer;  /* Integer type */
+	VAR f : Real; /* Real type */
+	VAR g : Word[7]; /* Word[7] type */
+
+The type set_of_integers is always casted to Integer and will not be presented 
+below.
+
+To save space, I will use the following terms:
+"Bool" = boolean
+"Symb" = set_of_symbols
+"SymbInt" = set_of_integers_and_symbols
+"Int" = Integer
+"Real" = Real
+"W[N]" = Word[N]
+
+========
+2. Implicit type conversion.
+========
+Some types can be implicitly converted to another one.
+Here is the full list:
+     Bool -> Int 
+     Bool -> Real
+     Bool -> SymbInt
+     Int -> Real
+     Int -> SymbInt
+     Symb -> SymbInt
+
+Here is a picture (maybe, it is more clear)
+
+Bool -> Int  -> Real		Word[N]
+         \
+    Symb -> SymbInt
+
+
+A type of the left had side is "smaller" than the type on the right
+hand side. For example, "Bool" is smaller then "Int", but we cannot
+compare Real and Symb.
+Implicit conversion is used in some binary expressions (when both
+operands have to have the same type) and set-expression. 
+In binary expression only one operand can be implicitly converted.
+
+========
+3. The type rules.
+========
+Below is a table of pairs of the following from:
+      
+      operator : signature
+
+, where "operator" is an syntactic operators allowed in the NuSMV
+language and "signature", is an allowed signature of the operator.
+	 
+For example,
+    
+	left-shift(<<) : W[N] * W[N] -> W[N]
+means that the left-shift operator is binary, the types of its
+operands and the whole expression's type must be the same "Word[N]"
+type (where N is a positive number). Of cause, there can be several
+signatures for the same operator.
+
+To save space, operators will be grouped, so there can be several
+operators on the left hand side, and several signatures on
+the right hand side:
+
+operator1 operator2  etc
+	: signature1 
+	signature2
+	etc
+
+For example:
+
++ -  /  * 
+	: Real * Real -> Real
+	Int * Int -> Int
+
+------------------ TYPE RULES -----------------------------
+
+-----------------------------------------------------------
+TRUE: Bool
+FALSE: Bool
+NUMBER: Int
+WORD NUMBER: W[N] (where N is the width of the word constant)
+REAL NUMBER: Real
+-----------------------------------------------------------
+NUMBER..NUMBER : Int
+-----------------------------------------------------------
+identifier
+	: Symb (if "identifier" is a symbol constant) or 
+	"type" (if "identifier" is a variable and its type is "type"). 
+("identifier" is a syntax rule "ATOM {.ATOM | .NUMBER | .[NUMBER]}*"
+If variable's type is "set_of_integers" it is converted to Int.
+)
+
+-----------------------------------------------------------
+not(!) : Bool -> Bool
+	W[N] -> W[N]
+-----------------------------------------------------------
+bool : W[1] -> Bool
+word1 : Bool ->W[1]
+-----------------------------------------------------------
+next init : any type -> the same type
+-----------------------------------------------------------
+() : any type -> the same type
+-----------------------------------------------------------
+concatenation(::) 
+	:  W[N] * W[M] ->W[N+W]
+	Bool * W[N] -> W[N+1]
+	W[N] * Bool -> W[N+1]
+	Bool * Bool -> W[2]
+-----------------------------------------------------------
+Bit-selection
+
+exp1[exp2 : exp3]
+
+exp1 must be W[N], and exp2 and exp3 must be 
+NUMBER. The whole expression type is W[exp2-exp3+1].
+(In future, exp2 and exp3 will have to be a constant expression of Int
+type).
+By the way, in a variable declaration in the type specification
+"word[exp]", exp also must be NUMBER (in future it also will have to
+be a constant expression of Int type).
+-----------------------------------------------------------
++ -  /  *
+	: Bool * Bool -> Int
+	Int * Int -> Int
+	Real * Real -> Real
+	W[N] * W[N] ->W[N]
+(if required, implicit conversion is performed on one of the operands)
+-----------------------------------------------------------
+mod	: Int * Int -> Int
+	W[N] * W[N] ->W[N]
+-----------------------------------------------------------
+shifts(<<  >>)  rotates(<<<  >>>) 
+	   : W[N] * Int -> W[N]
+	   W[N] * Bool -> W[N]
+-----------------------------------------------------------
+=  !=  
+	: Bool * Bool -> Bool
+	Int * Int -> Bool
+	Real * Real -> Bool
+	W[N] * W[N] -> Bool
+	Symb * Symb -> Bool
+	SymbInt * SymbInt -> Bool
+	Bool * W[1] -> Bool
+	W[1] * Bool -> Bool
+(if required, implicit conversion is performed on one of the operands)
+(Notice, that we cannot compare Real and SymbInt, but can compare Real and 
+Int.)
+-----------------------------------------------------------
+>  <  >=  <= : 
+	Bool * Bool -> Bool
+	Int * Int -> Bool
+	Real * Real -> Bool
+	W[N] * W[N] -> Bool
+	Bool * W[1] -> Bool
+	W[1] * Bool -> Bool
+(if required, implicit conversion is performed on one of the operands)
+-----------------------------------------------------------
+xor  xnor  and(&)  or(|)   implies(->)  iff(<->) 
+	: Bool * Bool -> Bool
+	W[N] * W[N] -> W[N]
+-----------------------------------------------------------
+Set-expression.
+
+{exp, exp, exp, ... } : "type"
+, where "type" is a such minimal type, that
+all the operands can be implicitly converted to "type".
+The types Real and W[N] are NOT allowed, i.e.
+only Bool, Int, Symb and SymbInt are allowed.
+
+union : the same as {exp, exp}
+
+in    : Bool * Bool -> Bool
+	Int * Int -> Bool
+	Symb * Symb -> Bool
+	SymInt * SymbInt -> Bool
+(if required, implicit conversion is performed on one of the operands)
+-----------------------------------------------------------
+Case-expression
+
+"case 'expCond1' : 'expResult1'; 
+      'expCond2' : 'expResult2'; 
+      ... 
+esac"
+
+expCondN must be Bool, and the whole expression's type is such a
+minimal type, that all the operands can be implicitly converted to
+"type".
+Note, that W[N] and Real ARE allowed.
+
+-----------------------------------------------------------
+EX  AX  EF  AF  EG  AG  X  Y  Z  G  H  F  O  : Bool -> Bool
+-----------------------------------------------------------
+A-U  E-U  U  S  : Bool * Bool -> Bool
+-----------------------------------------------------------
+A-BU  E-BU  : Bool * number..number * Bool -> Bool
+(numbers are not checked)
+-----------------------------------------------------------
+EBF  ABF  EBG  ABG  : number..number * Bool -> Bool
+(numbers are not checked)
+-----------------------------------------------------------
+releases(V) triggered(T): they does not exising after parsing, because
+during parsing (a V b) is converted to (not((not a) U (not b)))
+and (a T b) is converted to (not((not a) S (not b)).
+-----------------------------------------------------------
+assignment(:=)
+	: Bool * Bool -> no-type
+	Int * Int -> no-type
+	Real * Real -> no-type
+	Symb * Symb -> no-type
+	SymbInt * SymbInt -> no-type
+	W[N] * W[N] -> no-type
+	Bool * W[1] -> no-type
+	W[1] * Bool -> no-type
+(if required, implicit conversion is performed on the RIGHT operand only)
+Note: implicit conversion is not performed on the left operand.
+Notice that we allow "Bool := Int" and "Int := SymbInt" types.
+
+-----------------------------------------------------------
+
+========
+4. High level constructs.
+========
+
+For the high level statements, such as TRANS or INVAR, the type rules
+are following:
+
+TRANS : Bool -> no type
+INIT : Bool -> no type
+INVAR : Bool -> no type
+SPEC : Bool -> no type
+LTLSPEC : Bool -> no type
+INVARSPEC : Bool -> no type
+ASSIGN : no type -> no type
+COMPUTE-MAX COMPUTE-MIN: Bool * Bool -> no type
+JUSTICE : Bool -> no type
+COMPASSION : Bool -> no type
+
+========
+5. Warning and Error messages.
+========
+
+If an expression does not obey any of the above type rule, then this is an
+error, an error message is output.
+There are no warning messages at the moment, but they can be.
+
+There will be a command line option or a shell variable which will make
+expressions with "old" types (Bool, Int, Symb, SymbInt) always
+type correct (or correct with warning message output) - this is
+necessary for backward compatibility.
+
+
+[AT]

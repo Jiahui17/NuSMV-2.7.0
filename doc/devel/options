@@ -1,0 +1,117 @@
+======================================================================
+Devel documentation
+
+ Author: Mariotti Alessandro (mariotti@fbk.eu)
+ Copyright: FBK-irst 2010
+======================================================================
+
+This document briefly describes the options system from the developers
+point of view.
+
+System options (or environmnent variables) inside NuSMV are managed by
+the OptsHandler (in the opt/ package). The options handler supports
+4 types of options:
+
+- Generic string options: Standard options that have as value
+  arbitrary strings
+
+- Integer options: Standard options that have as value arbitrary
+  integer values
+
+- Enumerative options: Options that have a limited number of possible
+  values, which are predetermined
+
+- Boolean options: Options that can only assume TRUE and FALSE as
+  values.
+
+- User defined options: A special case of generic string
+  options. These should be used when the option is defined by the user
+  via the user-interface (i.e using command "set" in interactive mode).
+
+OPTIONS HANDLER INSTANCES
+
+The NuSMV global options handler instance can be retrieved using the
+following function:
+
+OptsHandler_get_instance()
+
+If people needs a fresh instance of options handler for their own
+uses, they can use the OptsHandler_create() method. This new instance
+will NOT affect the global one, and will not be usable using the "set"
+command in NuSMV.
+
+REGISTERING AN OPTION 
+
+Adding an option to the system needs the following:
+
+- A name for the option: No options with the same name are allowed.
+
+- A default value for the option: May be NULL for strings
+
+- A list of valid enumerative values and the relative string
+  representation, if the option is enumerative.
+
+Note that NuSMV CORE options are usually registered in the opt/
+package. In detail, optCmd.c opt.h and optInt.h are the files where to
+look at.
+
+The option can be registered in the following way:
+
+boolean res = 
+   OptsHandler_register_[int|bool|generic|enum|user]_option(instance,
+                                                            OPT_NAME,
+                                                            OPT_DEF_VALUE,
+                                                            [enum_values],
+                                                            is_public)
+Where:
+
+- instance is the OptsHandler instance
+
+- OPT_NAME is the option unique name.
+
+- OPT_DEF_VALUE is the defaul value for that option
+
+- enum_values is the list of possible enumerative values, if
+  registering an enumerative option
+
+- is_public is a boolean flag, which tells the OptsHandler if the
+  option should be exposed to the user or not.
+
+See opt/OptsHandler.h for details of single functions.
+
+Other three functions should be defined when registering an option:
+
+set_option_name(OptsHandler_ptr opt, value)
+unset_option_name(OptsHandler_ptr opt)
+val get_option_name(OptsHandler_ptr opt)
+
+For some examples of the body of this functions, see the opt/optCmd.c
+file
+
+OPTIONS TRIGGERS
+
+Triggers can be added to registered options in order to provide a
+special way to check assigned values to the option itself.  A trigger
+is activated when the option value is set/reset or read.
+
+Triggers can be added in the following way:
+
+OptsHandler_add_option_trigger(intance, OPT_NAME, trigger_fun).
+
+Trigger fun is a function which must have the following signature:
+
+boolean fun_name (OptsHandler_ptr inst, const char * opt_name,
+                  const char* opt_value, Trigger_Action action);
+
+Where:
+
+- "inst" is the OptionsHandler instance where the option is registered.
+        
+- "opt_name" is the option name of the activated trigger
+
+- "opt_value" is the string representation of the new assigned value
+  to the option
+
+- "trigger_action" is an enumerative, with "ACTION_SET",
+  "ACTION_RESET", "ACTION_GET" as possible values, and tells the
+  action performed on the option.

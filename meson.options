@@ -1,0 +1,85 @@
+option(
+  'build-doc',
+  type: 'feature',
+  value: 'auto',
+  description:
+    'If enabled (or --buildtype=release), build documentation by default'+
+    ' if `doxygen` and `latexmk` are found.'+
+    ' Invoke `doc` target to build it manually.'
+)
+
+option(
+  'with-bignumbers',
+  type: 'feature',
+  value: 'auto',
+  description:
+    'If enabled (or auto), use unlimited words width'+
+    ' (if library GMP is found)',
+)
+option(
+  'with-compass',
+  type: 'feature',
+  value: 'auto',
+  description:
+    'if enabled or auto, enable the compass addon',
+)
+option(
+  'with-libxml2',
+  type: 'feature',
+  value: 'auto',
+  description:
+    'If enabled or auto, link with XML C parser and toolkit'+
+    ' (requires libxml2)',
+)
+option(
+  'with-gtest',
+  type: 'feature',
+  value: 'auto',
+  description:
+    'If enabled (or auto), use C++ test framework GoogleTest for extra tests'+
+    ' (if library gtest is found)',
+)
+option(
+  'with-ltl2smv',
+  type: 'feature',
+  value: 'auto',
+  description:
+    'If enabled or auto, build the executable `ltl2smv`',
+)
+option(
+  'with-minisat',
+  type: 'feature',
+  value: 'auto',
+  description:
+    'If enabled or auto, enable the MiniSAT solver.',
+)
+option(
+  'with-profiler',
+  type: 'feature',
+  value: 'auto',
+  description:
+    'If enabled, link with the BMC profiler library',
+)
+option(
+  'with-shell',
+  type: 'feature',
+  value: 'enabled',
+  description:
+    'If enabled or auto, build the interactive mode',
+)
+option(
+  'with-watchdog',
+  type: 'feature',
+  value: 'auto',
+  description:
+    'If enabled, link with the watchdog library',
+)
+
+option(
+  'data-dir',
+  type: 'string',
+  value: '',
+  description:
+    'Set data folder to `<data-dir>/nusmv`. `~` is accepted.'+
+    ' Default to `/usr/share/nusmv` or `./nusmv` under Windows',
+)

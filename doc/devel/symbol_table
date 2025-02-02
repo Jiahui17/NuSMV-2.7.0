@@ -1,0 +1,128 @@
+======================================================================
+Devel documentation
+
+ Author: Roberto Cavada
+ Copyright: FBK-irst 2006
+ $Id: symbol_table,v 1.1.2.1.6.2 2007-06-04 23:21:39 nusmv Exp $
+======================================================================
+
+
+This document provides general information about:
+1. Symbol Layers
+2. Symbol Table
+
+
+----------------------------------------------------------------------
+0. Overview and terminology
+----------------------------------------------------------------------
+Symbols in nusmv are:
+- State, Input and Frozen variables 
+- defines
+- constants
+
+Symbols are declared into one or more symbol tables. At the moment
+there exists only one global symbol table that contains the complete
+set of system symbols, but in general symbols may be spread over
+multiple symbol tables. 
+
+Symbols declared into a symbol table are organized as groups of
+symbols. Each group is a partially ordered collection of symbols
+that is called layer.
+
+
+----------------------------------------------------------------------
+1. Symbol Layers
+----------------------------------------------------------------------
+
+A layer is a collection of symbols within a symbol table. A new layer
+is created within a symbol table, and from that moment on it belongs
+to the symbol table. After creation, symbols are declared into the
+layer, and as a consequence into the symbol table the layer belongs
+to. 
+
+After declaring a symbol, it is later possible to retrieve information
+about that symbols, like the nature of a symbol (e.g. variable,
+define, etc.) or information about the symbols collection (e.g. list
+of state variables, number of defines, etc.)
+
+1.1 Symbols ordering
+The timestamp of each symbol declaration within a layer provides the
+order of that symbol within the layer. Also, each layer within the
+symbol table has an ordering that is called insertion policy. The
+insertion policy provides a mechanism to order the entire layer with
+respect to other layers that live in the same symbol table. This
+mechanism can be used for example to force a layer to stay at the top
+(bottom) of others. 
+
+1.2 Commit to encodings
+After a set of symbols has been declared within a layer, the layer
+must be committed to one or more encodings (see documentation related
+to encodings for more detailed information about encodings). Depending
+on the encoding type a layer has been committed to, the symbols
+declared in the layer will then be available by the several system
+technologies, like BDD and BMC. 
+
+It is important to know that after committing a layer to an encoding,
+it is not possible to commit again the same layer to same
+encoding. Also, symbols within a layer are encoded only at commit
+time by an encoding, and later declaration of symbols within the same
+layer will not be encoded automatically within the encoding which the
+layer has been committed.
+
+Furthermore, before removing a layer from the symbol table it belongs
+to, it is needed to have the layer removed from all the encodings it
+has been committed to. 
+
+After a layer has been removed from a symbol table, all the symbols
+that it contained (with the relative encodings) will no longer be
+available at system level.
+
+1.3 Packages, files and classes
+Layers are instances of the class SymbLayer, the public interface is 
+SymbLayer.h, contained into the package compile.symb_table
+
+
+----------------------------------------------------------------------
+2. Symbol Tables
+----------------------------------------------------------------------
+
+Each symbol table is the central repository for querying information
+about symbols that have been declared within it. There are other
+entities in the system that refer (contain or use) them. For example:
+
+- A FSM will contain a reference to the symbol table which its symbols
+  are declared in.
+- An encoding will use a symbol table to extract symbols and their
+  information to encode the symbols for example as BDDs. 
+
+When declaring a new symbol, it is needed to use layers, but to obtain
+information about symbols it is common practice to use the symbol
+table which the layers are created in. 
+
+2.1 Layer lifecycle
+Layers are created at symbol table level by providing a name (as a
+string) that will be later used to refer to the layer. When creating a
+layer, insertion policy within the symbol table will be specified as
+well. After creation, symbols are declared within that layer, and then
+the layer will be committed to encodings to make symbols available to
+the different system techniques. 
+When symbols are no longer used, the layer will be removed from the
+encodings, and finally from the symbol table to destroy the symbols. 
+
+2.2 Default layers and global symbol table
+The globally available symbol table instance is retrievable through
+the function Compile_get_global_symb_table()
+
+A symbol table instance should be always passed to function that need
+it, and global symbol table should be accessed only by top-level
+functions.
+
+There are two default layers that are always created at system
+initialization time: 
+- layer for model symbols (MODEL_LAYER_NAME)
+- layer for determinization variables (DETERM_LAYER_NAME)
+
+
+2.2 Packages, files and classes
+Package is compile.symb_table, public interface is SymbTable.h and the
+class is SymbTable. 

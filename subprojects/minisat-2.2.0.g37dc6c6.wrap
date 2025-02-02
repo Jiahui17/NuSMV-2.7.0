@@ -1,0 +1,9 @@
+[wrap-file]
+#source_url = https://github.com/niklasso/minisat/archive/37dc6c67e2af26379d88ce349eb9c4c6160e8543.zip
+source_filename = minisat-2.2.0.g37dc6c6.zip
+directory = minisat-37dc6c67e2af26379d88ce349eb9c4c6160e8543
+source_hash = a785fa863de61fb18926dc6ade1686231c2236bdc048944e9822f181267ab8da
+patch_directory = minisat-2.2.0.g37dc6c6
+diff_files =
+# minisat-2.2.0.g37dc6c6+0001-proof.patch
+  minisat-2.2.0.g37dc6c6+0001-nusmv.patch

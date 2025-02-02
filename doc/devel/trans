@@ -1,0 +1,31 @@
+Author: [RC]
+Use: Internal 
+Goal: This minidoc documents analysis for general transition relations. 
+      The goal is to keep track of ideas until the new feature is implemented
+
+======================================================================
+
+- trans from a clusters list to a clusters tree
+
+- to help building of trans we might think to export primitives
+
+- tree construction
+  - nodes identify either conjunctions or disjunctions
+  - leaves are clusters
+  - we store subtree height into each node
+
+- scheduling: 
+  - quantification vars are no longer associated to clusters, but to nodes
+  - each node represent a quantification node
+  - from leaves (clusters) to parent we bring cluster's support
+  - we bring up sum of left and right branches
+  - after bottom to up, we proceed top-down to remove redundant 
+    quantified variables
+    
+- images:
+  - for and nodes: we search the deeper cluster and we conjunctivate it 
+    with s(V)
+  - and nodes: we propagate s(V) down both to the left and right
+
+Whatever is out of the trans package has not to be changed. 
+We might think to move trans package into fsm

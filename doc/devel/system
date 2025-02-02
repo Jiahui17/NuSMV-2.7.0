@@ -1,0 +1,126 @@
+======================================================================
+ Devel documentation
+
+ Author: Roberto Cavada
+ Copyright: FBK-irst 2007
+ $Id: system,v 1.1.2.2 2007-06-04 23:21:39 nusmv Exp $
+======================================================================
+
+The goal of this document is to provide the user with a minimal
+common terminology about NuSMV. The document provides high-level
+information about a few entities living into the system, and some
+pointer to external docs for further information. Unfortunately
+this doc is far from being exhaustive, but can be a valid
+entry-point for a beginner. 
+
+
+----------------------------------------------------------------------
+1. Data representation 
+
+   Data is kept into different forms into NuSMV. The way data is
+   represented inside the system depends on the moment data is
+   used, the way data is used and the nature of the information
+   data represents.
+
+ 1.1 Before parsing, data is represented by text into an SMV file.
+   
+ 1.2 During parsing, text is converted into a parse tree whose
+     nodes are node_ptr structures. node_ptr are the way symbols
+     are represented into the system, and it is the the
+     representation that is closest to the original text
+     representation.
+
+ 1.3 During flattening, node_ptr are 'flattened' into other
+     node_ptr.
+
+ 1.4 Booleanization (activated by Bounded Model checking (BMC),
+     for example) booleanizes flattened scalar values represented
+     by node_ptr, again into node_ptr. For implementation details
+     that are not important here, the booleanization process uses
+     BDDs (see below) to perform booleanization.
+
+ 1.5 When activating BDD-based Model Chcking (MC), node_ptr are
+     converted into BDDs to perform MC.
+
+ 1.5 When activating BMC, node_ptr are converted into Boolean
+     Expression (BE) that are a generalization of Reduced Boolean
+     Circuits (RBC).
+
+
+----------------------------------------------------------------------
+2. Language
+
+   The language of a FSM is the set of state, input and frozen
+   variables that are declared into the SMV file. Symbols are
+   parsed and flattened by the compiler. The language may be
+   enriched later by NuSMV when determinizing expressions, or when
+   creating tableaux when performing some kind of model
+   checking. This enrichment requires to distinguish between the
+   original language declared by the user into the SMV file (the
+   "model" language) and the whole language that will result
+   later.
+
+   Variable names are always characterized by a unique name and a
+   type. Symbols are declared into a Symbol Table and are
+   organized into logical partitions that are called Layers. See
+   files symbol_table and typeSystem.txt for further information. 
+
+
+----------------------------------------------------------------------
+3. Encoders
+
+   After a language has been declared, symbols are needed to be
+   encoded into the particular data representation that depends on
+   the model checking engine is being used. Encoding is performed
+   by entities called Encoders. At the moment there are the
+   boolean encoder, the BDD encoder and the BE encoder. See file
+   encodings for further information about encoders. 
+
+
+----------------------------------------------------------------------
+3. FSMs
+
+   After encoding has been carried out, it is possible to build
+   Finite State Machines for the use that is required by the
+   user. To dump the boolean flattened model a boolean FSM is
+   required; to perform BDD-based MC a BDD FSM is required; etc.
+
+   All kinds of FSMs are qualitatively similar to each other. All
+   have an initial states set, a invariant states set, a
+   transition relation, and fairness conditions. What is different
+   is the data they use to represent information, and the way the
+   data are organized internally. 
+
+   To help constructing FSMs, an helper entity called FsmBuilder
+   can be used.
+
+ 3.1 SexpFsm
+     A SexpFsm is a FSM whose base data structure is a node_ptr. A
+     SexpFsm can be either scalar or boolean, where a boolean
+     SexpFsm is a booleanized scalar SexpFsm. This kind of FSM is
+     functional to create both a BDD-based FSM and BE-based FSM.
+    
+ 3.2 BddFsm
+     A BddFsm used BDDs to keep the information it
+     needs. Transition relation can be clusterized, meaning that
+     independent pieces of the transition relation can be keep
+     (stored) into separated clusters. BddFsm are created from a
+     scalar 
+
+ 3.3 BeFsm 
+     BeFsm is used by BMC, and it is constructed from a boolean
+     SexpFsm. Internally, information about init, trans, etc. is
+     represented by BEs.
+
+
+----------------------------------------------------------------------
+4. Properties
+   
+   Properties are structures holding the specification (a formula
+   expressed as node_ptr), the type of the specification (LTL,
+   CTL, etc.), the status of the MC about it (was it found true,
+   false, or still unchecked?), and a possible counter-example
+   that may be found by MC showing why the specification is false.
+
+   Properties live and are organized into the Property Database
+   (PropDB).

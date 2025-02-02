@@ -1,0 +1,121 @@
+Mantainer: Marco Gario
+Last Change: $Id$
+
+------------
+Abstract
+------------
+
+This directory contains information on using Eclipse to develop on NuSMV.
+In this file we describe the steps needed to configure Eclipse.
+
+------------
+Instructions
+------------
+
+01. Check-out NuSMV (https://essvn.fbk.eu/svn/NuSMV2/trunk)
+02. To enable debug symbols, set the environment variable:
+    CPPFLAGS=" -g "
+03. Build NuSMV. As usual, starting from cudd, minisat, (eventually)
+    MathSAT, nusmv, addons, esmc.
+04. Download Eclipse CDT
+05. Create one project for each part of NuSMV in eclipse using the
+    "Makefile Project with Existing Code" project wizard:
+    * cudd-2.4.1.1
+    * addons
+    * esmc
+    * MathSAT07
+    * nusmv
+
+06. Set the dependencies of the projects:
+    Right Click on the project -> Properties -> Project References
+
+    Project | Dependency
+    nusmv   | cudd
+    esmc    | nusmv cudd MathSAT07 addons
+    addons  | nusmv cudd MathSAT07 esmc
+
+    (Note: It is possible to just include nusmv, esmc and addons as 
+     	   projects, but having the other projects is convenient for
+     	   faster reference access)
+	   
+07. In esmc project properties, C/C++ build options, set the
+    Build Command to "make -j" (to use the multicore compiling)
+
+08. For each project, rebuild the index
+    (Right-click on the project -> Index -> Rebuild)
+
+09. Import the NuSMV code-style in the editor 
+    (Properties -> C/C++ General -> Code Style -> Import)
+
+10. Import the templates 
+    (Preferences -> C/C++ -> Editor -> Templates -> Import)
+
+11. Import the code templates (codetemplate.xml) 
+    (Preferences -> C/C++ -> Code Style -> Code Templates -> Import)
+    The code templates allow to create C/Header files with the standard
+    NuSMV template.
+
+
+------------
+CPPCheck
+------------
+
+It is possible to integrate CPPCheck within Eclipse to get in-code
+notification of potential problems.
+
+The steps for doing so are:
+1. Install cppcheck (either system-wide or locally)
+2. Install cppcheclipse from the Eclipse market place 
+   (Eclipse restart required)
+3. Right click on the folder to check, and the new option cppcheck
+   should be available.
+   The first time you run CPPCheclipse, it will ask you to setup the
+   path for cppcheck.
+4. In the preferences it is possible to define the level of detail.
+   Window->Preference->Cppcheclipse->Settings
+   Select: "Check for all known issues (all)"
+
+After running cppcheck, lines with problems will be marked in yellow,
+and the explanation of the problem provided.
+
+Ctrl+Shift+C can be used run cppcheck on the selected resource. 
+
+NOTE: running cppcheck on a single file will cause several "Function
+      not used" warnings for global functions.
+
+------------
+Valgrind
+------------
+
+It is possible to integrate Valgrind within Eclipse, by using the
+Linux Tools plugin. This plugin contains several tools for C/C++ 
+analysis.
+
+1. Install Valgrind system-wide 
+2. From the Eclipse market place install Valgrind (within the
+   linux tools package)
+3. A new "Profiling" button will appear. This is also accessible
+   from the Run menu.
+   To run Valgrind select:
+   - Run -> Profile As -> Profile with Valgrind
+
+Running Valgrind this way provides a nice summary window, and 
+contextual information in the editor view ("bas" lines are 
+highlighted)
+
+------------
+Known Limitations
+------------
+
+The approach described here has some known limitations, some of which
+might be addressed in the future.
+
+1. There is no integration with SVN, yet. This point will most likely
+   be addressed in the near future.
+
+2. The coding style rules are not enforced. There is no warning when 
+   the coding style rules are not respected, but they are used for 
+   automatically generated code.
+   NOTE: DO NOT use the beautifier, since this will most likely break
+         the code.
+

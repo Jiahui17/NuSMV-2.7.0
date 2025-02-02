@@ -1,0 +1,7 @@
+[wrap-file]
+#source_url = https://github.com/ivmai/cudd/archive/refs/tags/cudd-2.4.1.tar.gz
+source_filename = cudd-2.4.1.tar.gz
+source_hash = a8cd07d9f6e9b144c479ddcf21f17145acbe6ef2cb9f990c6c7765721312fe15
+directory = cudd-cudd-2.4.1
+patch_directory = cudd-2.4.1
+diff_files = cudd-2.4.1+0001-nusmv.patch

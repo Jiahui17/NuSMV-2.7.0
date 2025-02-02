@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" description="Insert a CFile Comment" enabled="true" name="cfileComment">/**CFile***********************************************************************
+
+  FileName    [${file_name}]
+
+  PackageName [XXX]
+
+  Synopsis    [required]
+
+  Description [optional]
+
+  SeeAlso     [optional]
+
+  Author      [${user}]
+
+  Copyright   [
+  This file is part of the ``XXX'' package.
+  %COPYRIGHT% ]
+
+******************************************************************************/
+</template><template autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" description="Insert a CHeaderFile Comment" enabled="true" name="cheaderfileComment">/**CHeaderFile*****************************************************************
+
+  FileName    [${file}]
+
+  PackageName [required]
+
+  Synopsis    [required]
+
+  Description [optional]
+
+  SeeAlso     [optional]
+
+  Author      [${user}]
+
+  Copyright   [
+  This file is part of the ``XXX'' package.
+  %COPYRIGHT%]
+
+******************************************************************************/
+</template><template autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" description="Insert a Enum Comment" enabled="true" name="enumComment">/**Enum************************************************************************
+
+  Synopsis    [required]
+
+  Description [optional]
+
+  SeeAlso     [optional]
+
+******************************************************************************/
+</template><template autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" description="Insert a Function Comment" enabled="true" name="functionComment">/**Function********************************************************************
+
+  Synopsis           [required]
+
+  Description        [optional]
+
+  SideEffects        [required]
+
+  SeeAlso            [optional]
+
+  CommandName        [optional]
+
+  CommandSynopsis    [optional]
+
+  CommandArguments   [optional]
+
+  CommandDescription [optional]
+
+******************************************************************************/
+</template><template autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" description="Insert a short Function comment" enabled="true" name="functionShortComment">/**Function********************************************************************
+
+  Synopsis           []
+
+  Description        []
+
+  SideEffects        []
+
+  SeeAlso            []
+
+******************************************************************************/
+</template><template autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" description="Insert a Macro Comment" enabled="true" name="macroComment">/**Macro***********************************************************************
+
+  Synopsis     [required]
+
+  Description  [optional]
+
+  SideEffects  [required]
+
+  SeeAlso      [optional]
+
+******************************************************************************/
+
+</template><template autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" description="Insert a Struct Comment" enabled="true" name="structComment">/**Struct**********************************************************************
+
+  Synopsis    [required]
+
+  Description [optional]
+
+  SeeAlso     [optional]
+
+******************************************************************************/
+</template><template autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" description="Insert a Variable Comment" enabled="true" name="variableComment">/**Variable********************************************************************
+
+  Synopsis    [required]
+
+  Description [optional]
+
+  SeeAlso     [optional]
+
+******************************************************************************/
+</template></templates>

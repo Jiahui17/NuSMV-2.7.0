@@ -1,0 +1,70 @@
+# Doxyfile 1.12.0
+
+#---------------------------------------------------------------------------
+# Project related configuration options
+#---------------------------------------------------------------------------
+PROJECT_NAME           = "NuSMV Developers Manual"
+PROJECT_NUMBER         = @VERSION@
+ABBREVIATE_BRIEF       =
+STRIP_FROM_PATH        = @DOXY_STRIP_FROM_PATH@
+ALIASES                = se="\par Side Effects:^^"
+ALIASES               += methodof="\related"
+ALIASES               += takes_mem="<b><i>Takes memory ownership</i></b>"
+ALIASES               += keeps_mem="<b><i>Keeps memory ownership, the caller must NOT free returned value</i></b>"
+ALIASES               += command{1}="\xrefitem cmd \"Command:\" \"Commands\" <b>\1:</b>"
+ALIASES               += command_args{1}="<b>Command arguments:</b> \1"
+ALIASES               += command_opts{1}="<b>Command options</b> <p><dl>\1</dl></p>"
+ALIASES               += opt{2}="<dt>-\1<dd> \2 </dd></dt><br/>"
+ALIASES               += arg{2}="<dt>\1<dd> \2 </dd></dt><br/>"
+ALIASES               += env_var{1}="\xrefitem env \"Environment variable\" \"Environment variables\" <b>\1:</b>"
+OPTIMIZE_OUTPUT_FOR_C  = YES
+TYPEDEF_HIDES_STRUCT   = YES
+TIMESTAMP              = YES
+#---------------------------------------------------------------------------
+# Build related configuration options
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = YES
+EXTRACT_PACKAGE        = YES
+EXTRACT_LOCAL_CLASSES  = NO
+CASE_SENSE_NAMES       = YES
+SORT_BRIEF_DOCS        = YES
+#---------------------------------------------------------------------------
+# Configuration options related to warning and progress messages
+#---------------------------------------------------------------------------
+QUIET                  = YES
+WARNINGS               = NO
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_DOC_ERROR      = NO
+WARN_IF_INCOMPLETE_DOC = NO
+#---------------------------------------------------------------------------
+# Configuration options related to the input files
+#---------------------------------------------------------------------------
+INPUT                  = @DOXY_INPUT@
+FILE_PATTERNS          = *.h \
+                         *.doxy \
+                         *Cmd.c
+RECURSIVE              = YES
+EXCLUDE_SYMLINKS       = YES
+EXCLUDE_PATTERNS       = */minisat* \
+                         */Minisat \
+                         */MiniSat
+EXAMPLE_PATTERNS       =
+#---------------------------------------------------------------------------
+# Configuration options related to the HTML output
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+HTML_OUTPUT            = @DOXY_HTML_OUTPUT@
+#---------------------------------------------------------------------------
+# Configuration options related to the LaTeX output
+#---------------------------------------------------------------------------
+GENERATE_LATEX         = NO
+#---------------------------------------------------------------------------
+# Configuration options related to the preprocessor
+#---------------------------------------------------------------------------
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+EXPAND_AS_DEFINED      = OVERRIDE
+#---------------------------------------------------------------------------
+# Configuration options related to external references
+#---------------------------------------------------------------------------

@@ -1,0 +1,137 @@
+======================================================================
+Devel documentation
+
+ Author: Roberto Cavada
+ Copyright: ITC-irst 2006
+ $Id: encodings,v 1.1.2.1 2006-04-13 15:48:52 nusmv Exp $
+======================================================================
+
+
+This document briefly describes encodings from the developers point of
+view. This document should be read after reading the document about
+symbol tables and symbol layers. 
+
+
+----------------------------------------------------------------------
+1. What are encodings 
+
+Encodings are structures that associate to a symbol (namely state and
+input variables) an internal represention for that symbol. There exist
+several encoding types in nusmv, that of course depend on the different
+techniques that are used to represent variables and expressions
+symbolically. For example BDDs technique represents (encodes) a
+boolean input variable as single BDD variable, and a boolean state
+variable as a pair current/next of BDD variables. Scalar (non boolean)
+variables are encoded as a logarithmic encoding associated with a
+mask to hide values that are not valid. For example a scalar variable
+'x' whose domain is [0,5] might be encoded with 3 boolean variables
+and a tree like:
+
+          x1
+       /      \
+     x2        x2
+    /  \      /  \
+  x3   x3    x3   x3
+ / \  / \   / \  / \
+0  1 2  3  4  5 -   -
+
+In the example left edges have value 0, and right edges have value 1. 
+For example x=2 is equivalent to (~x1 x2 ~x3). 
+Invalid values (x1 x2 -) are masked away by the encoding that must
+also keep a mask for this representation. 
+
+Note: implementation for encoding into nusmv is slightly different
+from the one that is pictured here, but the idea is the same. However,
+the way a variable or an expression is encoded is not important, as
+the encodings are structures mainly thought to keep hidden the details
+about the internal representation.
+
+In the following when we name 'encoding' we refer to the entity (or
+structure) that contains the mapping between symbols and its internal
+representation or encoding.
+
+
+----------------------------------------------------------------------
+2. Layers and variables ordering
+
+Symbols are encoded by encodings as soon as layers which contain the
+symbols are committed to the encodings. 
+After commitment of layer, the symbols will be usable by the engine
+that uses the encoding that the layer has been committed to.
+
+Variable ordering given by the layer's insertion policy and by the
+layer's internal symbols ordering is kept but is always mediated (and
+overloaded) by the explicit variable ordering if specified. See the 
+section about variable ordering in the nusmv user manual for further
+information about this topic. 
+
+
+----------------------------------------------------------------------
+3. Which encodings are currently available
+
+The currently supported model checking techniques determinize the
+available encoding types:
+ - BoolEnc: boolean encoding at node_ptr level
+ - BddEnc: encoding at BDD level
+ - BeEnd: encoding at BE level
+
+The BoolEnc is used as a base to build the BddEnc and BeEnc that are
+actually used by the BDD and BMC model checking engines. 
+
+3.1 BoolEnc 
+The BoolEnc is used a first step for the construction of other boolean
+encodings like BddEnc and BeEnc. When a layer 'L' is committed to this
+encoding the scalar variables into 'L' are encoded with logarithmic
+encoding. The new boolean variables that must be created from the
+booleanization process are declared to privately handled layer
+'L_bool' that is internally kept associated to 'L'. Then 'L_bool' is
+committed to the encoding as well.
+
+3.2 BddEnc 
+The BddEnc uses a BoolEnc to build BDD variables and encodings of the
+variables committed to the BoolEnc. When a layer 'L' is committed to 
+the BddEnc, both 'L' and 'L_bool' are retrieved and the BoolEnc is
+used to build encodings in BDD format. Furthermore, BDD masks are
+created to control invalid values in the resulting BDD encodings. 
+
+Layers insertion policy and internal symbols ordering will be
+respected as much as possible, but user's variable ordering (if
+specified) will be considered with higher priority. 
+
+Also, the BddEnc encoding will manage variable groups, that are blocks
+of BDD variables that are required to stay adiacent after CUDD dynamic
+reordering.
+
+
+3.3 BeEnc
+Very similar to the encoding BddEnc, but intended to handle encodings
+of BE variables, used by Bounded Model Checking. 
+
+
+----------------------------------------------------------------------
+4. Typical use
+
+After creation, an encoding is used typically like this:
+
+-1. Symbol table creation
+0.  Layers creation, symbols declarations
+1.  Layer 'L' is committed to the BoolEnc
+2.  Layer 'L' is committed to the BddEnd and/or to the BeEnc
+3.  (iterate to 1 or to 0 for other layers)
+4.  Layer 'L' is removed from BddEnd and/or to the BeEnc
+5.  Layer 'L' is removed from BoolEnc
+6.  (iterate to 4 for all the other committed layers)
+
+
+----------------------------------------------------------------------
+5. Package, files and classes
+Encodings source code is localized in the package 'enc' that contains
+a sub-packages for each specific encoding type. 
+
+Classes (and their packages) are:
+* enc.base.BaseEnc: virtual base class, common to all the encodings
+* enc.bool.BoolEnc: derived from BaseEnc
+* enc.base.BoolEncClient: base class for all encodings that are base on BoolEnc
+* enc.bdd.BddEnc: derived from BoolEncClient
+* enc.be.BeEnc: derived from BoolEncClient
+

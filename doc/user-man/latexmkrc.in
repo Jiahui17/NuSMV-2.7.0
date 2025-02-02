@@ -1,0 +1,15 @@
+$jobname='@LATEX_JOBNAME@';
+$pdf_mode=4; # lualatex
+$bibtex_use=2;
+$out_dir='@LATEX_OUTPUT@';
+$do_cd=1;
+
+ensure_path('BIBINPUTS', '@LATEX_BIBINPUTS@');
+ensure_path('TEXINPUTS', '@LATEX_TEXINPUTS@');
+
+add_cus_dep('ndx', 'nnd', 0, 'dx2nd');
+add_cus_dep('adx', 'and', 0, 'dx2nd');
+sub dx2nd {
+  return Run_subst("makeindex -o %D %S");
+}
+push @generated_exts, 'ndx', 'nnd', 'adx', 'and';

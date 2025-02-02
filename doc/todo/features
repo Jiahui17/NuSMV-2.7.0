@@ -1,0 +1,256 @@
+This file contains a list of things concerned to NuSMV, which are worth
+to be implemented:
+
+
+----------------------------------------------------------------------
+1. PORTING
+----------------------------------------------------------------------
+*) porting NuSMV to 64 bits (problems with cudd and RBCc).
+
+*) porting NuSMV on the last version of CUDD.
+
+*) Porting NuSMV on the latest version of Minisat
+
+
+----------------------------------------------------------------------
+2. REFACTORING
+----------------------------------------------------------------------
+*) Restructure bmc package in small sub-packages.
+
+*) Make inspection of code style documentation.
+   At least: package_quit() is used now instead of package_end().
+
+*) check functional dependencies for BMC encoding (see armin's paper BMC06)
+
+
+----------------------------------------------------------------------
+3. TESTING AND BENCHMARKING
+----------------------------------------------------------------------
+*) finishing the implementation of the benchmarking module.
+
+
+----------------------------------------------------------------------
+4. USABILITY AND USER INTERACTION
+----------------------------------------------------------------------
+*) uniform verbosity levels
+
+*) Add a command line option to enable backward compatibility on the
+    type checker
+    [ from MR]
+
+*) Decouple resolution method from the property
+
+*) New option handler from MBP
+
+*) script language
+
+*) Counter-examples from RAT
+
+*) GUI
+
+
+----------------------------------------------------------------------
+5. OPTIMIZATIONS
+----------------------------------------------------------------------
+*) Currently in FSM transition relation is clustered but invariants are not.
+    Probably, invariants should be kept as part of transition relation,
+    and therefore, clustered.
+    NB: Clustering is used to make computation of	
+        Exist state' Tr(state, input,state')
+    quicker, but actually this formula is usually goes as 
+        Exist state' Tr(state, input, state') & Invar(state')
+    so Tr and Invar(state') are always together.
+    Invariants also should be added to initial conditions.
+
+    Not clear if it is sufficient and the Invar(state') is needed
+    too. There is also FWD img
+
+    [from AT]
+
+*) clustering opzimizations: MR comment in bugzilla, and tentative and
+   with abort if the threshold of new nodes is reached a la Bwolen
+   Yang (ok cudd 2.4.1)
+
+*) detection of invariants AG p, G p to then handle it 
+
+
+----------------------------------------------------------------------
+6. LANGUAGE 
+----------------------------------------------------------------------
+
+*) Native support for release LTL operator. Currently it is rewritten
+  in terms of until.
+
+*) Add "min", "max" and "abs" operators (or functions) into SMV
+    language. They can be lowercase or uppercase.
+    These operators can be converted to "case" during evaluation, but
+    not earlier (because of error messages).
+    [from MB]
+
+*) parameters in the nusmv language (fixed values for all runs, can be
+   optimized untimed.) These would be untimed variables for BMC, and
+   variables with no next and that must not be quantified out. The
+   semantics indeed is :
+   no constraints on initial, and
+   next(p) := p;
+
+*) Add signed word operators (already supported by the core) to the
+   grammar
+   [RC]
+
+*) parser for fragments of sequential code
+
+*) DEFINE with next
+
+*) Give names to properties
+
+
+----------------------------------------------------------------------
+7. FEATURES
+----------------------------------------------------------------------
+*) allowing input variable in Dual algorithms in BMC package.
+
+*) Add unary minus (for integer, Word, real).
+
+*) Interpolant based model checking
+
+*) increase the limit on Word width (64 bits may not be enough)
+
+*) CEGAR
+
+*) RBC inlining
+
+*) create a function which would take a symbolic expression and return
+   the same symbolic expression but without implicit casts.  At least,
+   0 and 1 should be integers, TRUE and FALSE should be boolean, bool
+   <-> word[1] convertions should be wrapped in the explicit casts.
+   [from AC]
+
+*) add a new command called "guess_order" that exploits information on
+   the word level to decide which variables should be interleaved.
+   [from AC]
+
+*) extend PSL parser to deal with word expressions.
+    [from MR]
+
+*) circuit encoding per words (senza add)
+
+*) armin's aiger. There is also a AIG library from Colorado (Fabio S.)
+   that has also BDD sweeping to simplify the AIG.
+
+*) new CNF by Sheridan
+
+*) all sat; enumeration of minimal models enumeration (dual rail)
+
+*) quantification of useless inputs
+
+*) tree like scheduling of quantication
+
+*) printing of epxressions
+   - Here it would be interesting to consider the possibility of using
+     essentials
+
+*) verification layer PSL
+
+*) Identify intersection of LTL and CTL as to be able to handle CTL
+   with BMC, or dually to handle LTL with CTL MC
+
+*) Library of NFA/DFA with symbolic labels for SERE component of PSL.
+
+*) counters per PSL
+
+*) Revise CTL counterexample extraction, possibly avoiding recomputing
+   fix points by jkeeping informations computed in the MC phase
+
+*) ADD and word problems:  no reuse of previous computations in all cases.
+
+  (a & b) (b & a) are not recognized to be equal, and thus the second
+  one is recomputed. 
+
+  + A solution would be to add a flag to use for commutative
+    expressions to internally use a unique representation.
+
+  + An alternative solution would be to use a different version of
+    apply (the one provided natively from CUDD) that requires
+    functions as argument as follows for the OR, AND and PLUS:
+
+    add_ptr _addPlus(DdManager * dd, add_ptr * f, add_ptr * g) {   
+      add_ptr res;
+      add_ptr F, G;
+      node_ptr value;
+
+      F = *f; G = *g;
+
+      if (add_isleaf(F) && add_isleaf(G)) {
+	value = node_plus(add_get_leaf(F),add_get_leaf(G));
+	res = add_leaf(dd, value);
+        bdd_deref(res);
+	return(res);
+      }
+      if (F > G) { /* swap f and g */
+	*f = G;
+	*g = F;
+      }
+      return(NULL);
+    } 
+
+    add_ptr _addAnd(DdManager * dd, add_ptr * f, add_ptr * g) {
+      add_ptr F, G;
+      add_ptr res;
+
+      F = *f; G = *g;
+      if (add_iszero(F) || add_iszero(G)) {
+        res = add_zero(dd);
+        bdd_deref(res); /* routine assume not referenced */
+        return(ref);
+      }
+      /* if one of the operand is zero we are working on a boolean
+         expression */
+      if (add_isone(F)) return(G);
+      if (add_isone(G)) return(F);
+      if (F == G)) return(F);
+      /* both operands are complex of words */
+      if (add_isleaf(F) && add_isleaf(G)) {
+        /* we are working on a word */
+        value = node_and(add_get_leaf(F), add_get_leaf(G));
+        res = add_leaf(dd, value);
+        bdd_deref(res);
+        return(res);
+      }
+      if (F > G) { /* swap f and g */
+	*f = G;
+	*g = F;
+      }
+      return(NULL);
+    }
+
+    add_ptr _addOr(DdManager * dd, add_ptr * f, add_ptr * g) {
+      add_ptr F, G;
+      add_ptr res;
+
+      F = *f; G = *g;
+      if (add_isone(F) || add_isone(G)) {
+        res = add_one(dd);
+        bdd_deref(res); /* routine assume not referenced */
+        return(ref);
+      }
+      /* if one of the operand is zero we are working on a boolean
+         expression */
+      if (add_iszero(F)) return(G);
+      if (add_iszero(G)) return(F);
+      if (F == G) return(F);
+      /* both operands are complex of words */
+      if (add_isleaf(F) && add_isleaf(G)) {
+        /* we are working on a word */
+        value = node_or(add_get_leaf(F), add_get_leaf(G));
+        res = add_leaf(dd, value);
+        bdd_deref(res);
+        return(res);
+      }
+      if (F > G) { /* swap f and g */
+	*f = G;
+	*g = F;
+      }
+      return(NULL);
+    }
+

@@ -1,0 +1,101 @@
+======================================================================
+ Devel documentation
+
+ Author: Roberto Cavada
+ Copyright: FBK-irst 2007
+ $Id: library,v 1.1.2.2 2007-06-04 23:21:39 nusmv Exp $
+======================================================================
+
+The goal of this document is to provide some basic notion about how
+the library of NuSMV can be linked by external code. This doc is still
+alpha as it was never checked or tested.
+
+
+----------------------------------------------------------------------
+0. Terminology
+
+   - "The Library" is the top-level library of NuSMV
+
+   - "The Program" is the external program it is needed to link against
+      the library. 
+
+   - A "proper installation" of a program is the process of
+     installing it at system level, for example by running the
+     command 'make install'.
+
+   - A "local building" is the process of building a program and
+     not installing it properly. It means that the program is
+     built but not installed.
+
+----------------------------------------------------------------------
+1. Basic notions
+ 
+   The Library is made of many sub-libraries. All NuSMV libraries
+   are Libtool-based (1) and it is strongly recommended that
+   libtool is used to link the Program against the Library as
+   well.
+
+   NuSMV when properly installed can be linked by the Program by
+   using pkg-config (2) that is widely used to help configuring
+   and building programs.
+
+   If a local building is performed only, the Program will not be
+   able to link to the Library by using pkg-config. Instead, it
+   will have to link the Library explicitly.
+
+   Autotools (3) are also largely used to build NuSMV, and one
+   might think to use them also for building the Program.
+
+
+----------------------------------------------------------------------
+2. Header files
+
+   To include NuSMV's header files, it is needed to have in the
+   include path these directories:
+   - nusmv
+   - nusmv/src
+   - cudd/include
+   - relative paths "." and ".."
+
+
+----------------------------------------------------------------------
+3. An example
+
+   This example shows how automake files (Makefile.am) can be used
+   to link a Program called "extprog" to the Library. It is
+   assumed here that NuSMV was not properly installed (local
+   building) and that the filesystem is locally like this:
+
+   |- nusmv
+   |    |- libnusmv.la
+   |    |- src
+   |        |- ...
+   |- cudd
+   |   |- cudd
+   |
+   |- extprog_dir
+         |- ...  
+
+
+    # ==================================================
+    # extprog_dir/Makefile.am
+     NUSMV_DIR = ../nusmv
+     CUDD_DIR = ../cudd
+     INCLUDES = -I. -I$(top_srcdir)/$(CUDD_DIR)/include -I$(top_srcdir)/$(NUSMV_DIR)/src 
+    
+     bin_PROGRAMS = extprog
+     extprog_SOURCES = ...
+     extprog_LDADD = $(NUSMV_DIR)/libnusmv.la
+    # ==================================================
+
+
+
+----------------------------------------------------------------------
+Notes
+
+(1) <http://www.gnu.org/software/automake/manual/html_node/Libtool-Concept.html#Libtool%20Concept>
+
+(2) http://pkg-config.freedesktop.org/wiki/
+
+(3) http://en.wikipedia.org/wiki/GNU_build_system
+----------------------------------------------------------------------

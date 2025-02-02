@@ -1,0 +1,28 @@
+% -*-latex-*-
+\begin{nusmvCommand} {flatten\_hierarchy} {Flattens the hierarchy of modules}
+
+\ifthenelse{\boolean{showinfinitearrays}}{
+\cmdLine{flatten\_hierarchy [-h] [-d] [-e]}
+}
+{
+\cmdLine{flatten\_hierarchy [-h] [-d]}
+}
+
+This command is responsible of the instantiation of modules and
+processes. The instantiation is performed by substituting the actual
+parameters for the formal parameters, and then by prefixing the result
+via the instance name.
+
+\ifthenelse{\boolean{showinfinitearrays}}{
+\begin{cmdOpt}
+\opt{-d}{Delays the construction of vars constraints until needed}
+\opt{-e}{Expands the \WordArray expressions into individual elements expressions}
+\end{cmdOpt}
+}{
+\begin{cmdOpt}
+\opt{-d}{Delays the construction of vars constraints until needed}
+\end{cmdOpt}
+}
+
+
+\end{nusmvCommand}
