@@ -87,7 +87,7 @@
 
   \todo Missing description
 */
-#define MAX_ELEMENTS_PRINTABLE (double)(pow((double)2.0, (double)16.0))
+#define MAX_ELEMENTS_PRINTABLE (double)(pow((double)2.0, (double)24.0))
 
 
 /*!
@@ -6754,7 +6754,7 @@ static boolean is_max_elements_printable_exceeded(StreamMgr_ptr streams,
 {
   if (tmp_array_size > MAX_ELEMENTS_PRINTABLE) {
     StreamMgr_print_error(streams,
-            "\nwarning: the %s are more than 2^16: they will not be printed\n",
+            "\nwarning: the %s are more than 2^24: they will not be printed\n",
             elements_name);
     return true;
   }
@@ -6842,7 +6842,7 @@ BddEnc_ptr BddEnc_copy(const BddEnc_ptr bdd_enc_old)
 {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(bdd_enc_old));
   const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const MasterPrinter_ptr wffprint = MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));  
+  const MasterPrinter_ptr wffprint = MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   BddEnc_ptr bdd_enc_new; /* to be returned */
   BoolEnc_ptr bool_enc_old = BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(bdd_enc_old));
   BoolEnc_ptr bool_enc_new;
