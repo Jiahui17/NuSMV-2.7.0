@@ -61,7 +61,7 @@ To build NuSMV, you will need:
 * [Flex][]
 * GNU [Bison][]
 * GNU [patch][] utility
-* One of [libedit][] (Linux), [wineditline][] (Windows), or any BSD-compatible
+* One of [libedit][] (Linux, `apt-get install libedit-dev`), [wineditline][] (Windows), or any BSD-compatible
   alternative (Mac), if you want a shell (and you do).
 * [Python][] 3.x
 * Building system [meson][] with ninja, version 1.5 or greater
